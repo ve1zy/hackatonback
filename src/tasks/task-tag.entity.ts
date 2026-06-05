@@ -1,0 +1,17 @@
+import { Entity, PrimaryGeneratedColumn, Column, ManyToOne } from 'typeorm';
+import { Task } from './task.entity';
+
+@Entity('task_tags')
+export class TaskTag {
+  @PrimaryGeneratedColumn('uuid')
+  id: string;
+
+  @Column({ name: 'task_id' })
+  taskId: string;
+
+  @Column()
+  tag: string;
+
+  @ManyToOne(() => Task, task => task.tags)
+  task: Task;
+}
