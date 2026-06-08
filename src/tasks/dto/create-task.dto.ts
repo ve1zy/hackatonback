@@ -1,13 +1,23 @@
-import { IsString, IsNotEmpty, IsOptional, IsIn, IsDateString } from 'class-validator';
+import {
+  IsString,
+  IsNotEmpty,
+  IsOptional,
+  IsIn,
+  IsDateString,
+} from 'class-validator';
 
 export class CreateTaskDto {
   @IsString()
   @IsNotEmpty()
-  boardId: string;
+  projectId: string;
 
   @IsString()
-  @IsNotEmpty()
-  columnId: string;
+  @IsOptional()
+  columnName?: string;
+
+  @IsString()
+  @IsOptional()
+  columnId?: string;
 
   @IsString()
   @IsOptional()
@@ -27,7 +37,8 @@ export class CreateTaskDto {
 
   @IsString()
   @IsIn(['low', 'medium', 'high', 'critical'])
-  priority: 'low' | 'medium' | 'high' | 'critical';
+  @IsOptional()
+  priority?: 'low' | 'medium' | 'high' | 'critical';
 
   @IsDateString()
   @IsOptional()

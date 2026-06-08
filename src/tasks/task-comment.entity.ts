@@ -1,4 +1,10 @@
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, ManyToOne } from 'typeorm';
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  CreateDateColumn,
+  ManyToOne,
+} from 'typeorm';
 import { Task } from './task.entity';
 import { User } from '../users/user.entity';
 
@@ -7,13 +13,13 @@ export class TaskComment {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @Column({ name: 'task_id' })
+  @Column({ name: 'task_id', nullable: true })
   taskId: string;
 
   @Column({ name: 'user_id', nullable: true })
   userId: string;
 
-  @Column({ type: 'text' })
+  @Column({ type: 'text', nullable: true })
   content: string;
 
   @Column({ name: 'from_agent', default: false })
@@ -22,9 +28,9 @@ export class TaskComment {
   @CreateDateColumn({ name: 'created_at' })
   createdAt: Date;
 
-  @ManyToOne(() => Task, task => task.comments)
+  @ManyToOne(() => Task, (task) => task.comments)
   task: Task;
 
-  @ManyToOne(() => User, user => user.taskComments)
+  @ManyToOne(() => User, (user) => user.taskComments)
   user: User;
 }

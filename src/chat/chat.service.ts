@@ -11,14 +11,16 @@ export class ChatService {
     private chatMessageRepository: Repository<ChatMessage>,
   ) {}
 
-  async create(createChatMessageDto: CreateChatMessageDto): Promise<ChatMessage> {
+  async create(
+    createChatMessageDto: CreateChatMessageDto,
+  ): Promise<ChatMessage> {
     const message = this.chatMessageRepository.create(createChatMessageDto);
     return await this.chatMessageRepository.save(message);
   }
 
   async findByProject(projectId: string): Promise<ChatMessage[]> {
     return await this.chatMessageRepository.find({
-      where: { projectId },
+      where: { projectId: String(projectId) },
       relations: { user: true },
       order: { sentAt: 'DESC' },
     });

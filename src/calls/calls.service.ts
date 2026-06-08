@@ -24,7 +24,7 @@ export class CallsService {
 
   async findByProject(projectId: string): Promise<Call[]> {
     return await this.callRepository.find({
-      where: { projectId },
+      where: { projectId: String(projectId) },
       relations: { participants: true, actionItems: true },
       order: { createdAt: 'DESC' },
     });
@@ -41,17 +41,36 @@ export class CallsService {
     return call;
   }
 
-  async addParticipant(callId: string, userId: string): Promise<CallParticipant> {
-    const participant = this.callParticipantRepository.create({ callId, userId, joinedAt: new Date() });
+  async addParticipant(
+    callId: string,
+    userId: string,
+  ): Promise<CallParticipant> {
+    const participant = this.callParticipantRepository.create({
+      callId,
+      userId,
+      joinedAt: new Date(),
+    });
     return await this.callParticipantRepository.save(participant);
   }
 
-  async addActionItem(callId: string, rawText: string, taskId?: string): Promise<CallActionItem> {
-    const actionItem = this.callActionItemRepository.create({ callId, rawText, taskId });
+  async addActionItem(
+    callId: string,
+    rawText: string,
+    taskId?: string,
+  ): Promise<CallActionItem> {
+    const actionItem = this.callActionItemRepository.create({
+      callId,
+      rawText,
+      taskId,
+    });
     return await this.callActionItemRepository.save(actionItem);
   }
 
-  async updateTranscript(id: string, transcript: string, summary: string): Promise<Call> {
+  async updateTranscript(
+    id: string,
+    transcript: string,
+    summary: string,
+  ): Promise<Call> {
     await this.callRepository.update(id, { transcript, summary });
     return this.findOne(id);
   }

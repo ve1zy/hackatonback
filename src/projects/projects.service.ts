@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Repository, In } from 'typeorm';
 import { Project } from './project.entity';
 import { Board } from '../boards/board.entity';
 import { ColumnEntity } from '../columns/column.entity';
@@ -33,23 +33,33 @@ export class ProjectsService {
   async create(createProjectDto: CreateProjectDto): Promise<Project> {
     const project = this.projectRepository.create(createProjectDto);
     const savedProject = await this.projectRepository.save(project);
-    
+
     // Auto-create board with default columns
     const board = this.boardRepository.create({
       projectId: savedProject.id,
       name: 'Main Board',
     });
     const savedBoard = await this.boardRepository.save(board);
-    
+
     // Create default columns
     const defaultColumns = [
-      { boardId: savedBoard.id, name: 'Backlog', position: 0, color: '#6B7280' },
-      { boardId: savedBoard.id, name: 'In Progress', position: 1, color: '#3B82F6' },
+      {
+        boardId: savedBoard.id,
+        name: 'Backlog',
+        position: 0,
+        color: '#6B7280',
+      },
+      {
+        boardId: savedBoard.id,
+        name: 'In Progress',
+        position: 1,
+        color: '#3B82F6',
+      },
       { boardId: savedBoard.id, name: 'Done', position: 2, color: '#10B981' },
     ];
-    
+
     await this.columnRepository.save(defaultColumns);
-    
+
     return savedProject;
   }
 
@@ -73,47 +83,84 @@ export class ProjectsService {
   async getProjectDashboard(id: string): Promise<any> {
     const project = await this.projectRepository.findOne({
       where: { id },
-      relations: { user: true, members: { user: true }, boards: true },
     });
     if (!project) {
       throw new NotFoundException(`Project with ID ${id} not found`);
     }
 
-    // Get tasks with relations
-    const tasks = await this.taskRepository.find({
-      where: { board: { projectId: id } },
-      relations: { assignee: true, createdBy: true, column: true, tags: true, comments: true },
+    // Get columns and tasks - avoid joins by loading boards first
+    const boards = await this.boardRepository.find({
+      where: { projectId: String(id) },
     });
+    const boardIds = boards.map((b) => String(b.id));
+
+    const columns =
+      boardIds.length > 0
+        ? await this.columnRepository.find({
+            where: { boardId: In(boardIds) },
+          })
+        : [];
+
+    const tasks =
+      boardIds.length > 0
+        ? await this.taskRepository.find({
+            where: { boardId: In(boardIds) },
+          })
+        : [];
+
+    // Join columns to tasks manually
+    if (tasks.length > 0 && columns.length > 0) {
+      const columnMap = new Map(columns.map((c) => [c.id, c]));
+      tasks.forEach((task) => {
+        (task as Task & { column: ColumnEntity | null }).column =
+          columnMap.get(task.columnId) || null;
+      });
+    }
 
     // Get chat messages
     const chatMessages = await this.chatMessageRepository.find({
-      where: { projectId: id },
-      relations: { user: true },
+      where: { projectId: String(id) },
       order: { sentAt: 'DESC' },
       take: 100,
     });
 
     // Get calls
     const calls = await this.callRepository.find({
-      where: { projectId: id },
-      relations: { participants: { user: true }, actionItems: true },
+      where: { projectId: String(id) },
       order: { createdAt: 'DESC' },
     });
 
+    // Get members separately
+    const members = await this.projectMemberRepository.find({
+      where: { projectId: String(id) },
+    });
+
     return {
-      project,
+      project: { ...project, members },
+      columns,
       tasks,
       chatMessages,
       calls,
     };
   }
 
-  async update(id: string, updateProjectDto: UpdateProjectDto): Promise<Project> {
+  async update(
+    id: string,
+    updateProjectDto: UpdateProjectDto,
+  ): Promise<Project> {
     await this.projectRepository.update(id, updateProjectDto);
     return this.findOne(id);
   }
 
   async remove(id: string): Promise<void> {
     await this.projectRepository.delete(id);
+  }
+
+  async findByUserId(userId: string): Promise<Project[]> {
+    const members = await this.projectMemberRepository.find({
+      where: { userId },
+      relations: { project: true },
+    });
+    return members.map((m) => m.project);
   }
 }

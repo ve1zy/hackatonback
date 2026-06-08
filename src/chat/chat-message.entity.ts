@@ -1,4 +1,11 @@
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, ManyToOne } from 'typeorm';
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  CreateDateColumn,
+  ManyToOne,
+  JoinColumn,
+} from 'typeorm';
 import { Project } from '../projects/project.entity';
 import { User } from '../users/user.entity';
 
@@ -7,13 +14,10 @@ export class ChatMessage {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @Column({ name: 'project_id' })
+@Column({ name: 'project_id', nullable: true })
   projectId: string;
 
-  @Column({ name: 'user_id', nullable: true })
-  userId: string;
-
-  @Column({ type: 'text' })
+  @Column({ type: 'text', nullable: true })
   content: string;
 
   @Column({ name: 'platform_message_id', nullable: true })
@@ -25,9 +29,11 @@ export class ChatMessage {
   @CreateDateColumn({ name: 'sent_at' })
   sentAt: Date;
 
-  @ManyToOne(() => Project, project => project.chatMessages)
+  @ManyToOne(() => Project, (project) => project.chatMessages)
+  @JoinColumn({ name: 'project_id' })
   project: Project;
 
-  @ManyToOne(() => User, user => user.chatMessages)
+  @ManyToOne(() => User, (user) => user.chatMessages)
+  @JoinColumn({ name: 'user_id' })
   user: User;
 }

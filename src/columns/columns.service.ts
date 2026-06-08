@@ -18,7 +18,7 @@ export class ColumnsService {
 
   async findByBoard(boardId: string): Promise<ColumnEntity[]> {
     return await this.columnRepository.find({
-      where: { boardId },
+      where: { boardId: String(boardId) },
       order: { position: 'ASC' },
     });
   }
@@ -26,7 +26,6 @@ export class ColumnsService {
   async findOne(id: string): Promise<ColumnEntity> {
     const column = await this.columnRepository.findOne({
       where: { id },
-      relations: { board: true, tasks: true },
     });
     if (!column) {
       throw new NotFoundException(`Column with ID ${id} not found`);

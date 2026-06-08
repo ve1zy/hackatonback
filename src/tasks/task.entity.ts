@@ -1,4 +1,13 @@
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, ManyToOne, OneToMany } from 'typeorm';
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  CreateDateColumn,
+  UpdateDateColumn,
+  ManyToOne,
+  OneToMany,
+  JoinColumn,
+} from 'typeorm';
 import { Board } from '../boards/board.entity';
 import { ColumnEntity } from '../columns/column.entity';
 import { User } from '../users/user.entity';
@@ -13,10 +22,10 @@ export class Task {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @Column({ name: 'board_id' })
+  @Column({ name: 'board_id', nullable: true })
   boardId: string;
 
-  @Column({ name: 'column_id' })
+  @Column({ name: 'column_id', nullable: true })
   columnId: string;
 
   @Column({ name: 'assignee_id', nullable: true })
@@ -31,7 +40,7 @@ export class Task {
   @Column({ type: 'text', nullable: true })
   description: string;
 
-  @Column()
+  @Column({ default: 'medium' })
   priority: 'low' | 'medium' | 'high' | 'critical';
 
   @Column({ name: 'due_date', nullable: true })
@@ -43,36 +52,43 @@ export class Task {
   @Column({ name: 'source_message_id', nullable: true })
   sourceMessageId: string;
 
+  @Column({ default: false })
+  completed: boolean;
+
   @CreateDateColumn({ name: 'created_at' })
   createdAt: Date;
 
   @UpdateDateColumn({ name: 'updated_at' })
   updatedAt: Date;
 
-  @ManyToOne(() => Board, board => board.id)
+  @ManyToOne(() => Board, (board) => board.id)
+  @JoinColumn({ name: 'board_id' })
   board: Board;
 
-  @ManyToOne(() => ColumnEntity, column => column.tasks)
-  column: ColumnEntity;
+  @ManyToOne(() => ColumnEntity, (column) => column.tasks)
+  @JoinColumn({ name: 'column_id' })
+  column: ColumnEntity | null;
 
-  @ManyToOne(() => User, user => user.assignedTasks)
+  @ManyToOne(() => User, (user) => user.assignedTasks)
+  @JoinColumn({ name: 'assignee_id' })
   assignee: User;
 
-  @ManyToOne(() => User, user => user.createdTasks)
+  @ManyToOne(() => User, (user) => user.createdTasks)
+  @JoinColumn({ name: 'created_by' })
   createdBy: User;
 
-  @ManyToOne(() => ChatMessage, message => message.id)
+  @ManyToOne(() => ChatMessage, (message) => message.id)
   sourceMessage: ChatMessage;
 
-  @OneToMany(() => TaskTag, tag => tag.task)
+  @OneToMany(() => TaskTag, (tag) => tag.task)
   tags: TaskTag[];
 
-  @OneToMany(() => TaskComment, comment => comment.task)
+  @OneToMany(() => TaskComment, (comment) => comment.task)
   comments: TaskComment[];
 
-  @OneToMany(() => Reminder, reminder => reminder.task)
+  @OneToMany(() => Reminder, (reminder) => reminder.task)
   reminders: Reminder[];
 
-  @OneToMany(() => CallActionItem, item => item.task)
+  @OneToMany(() => CallActionItem, (item) => item.task)
   actionItems: CallActionItem[];
 }

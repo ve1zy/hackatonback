@@ -1,4 +1,10 @@
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, OneToMany } from 'typeorm';
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  CreateDateColumn,
+  OneToMany,
+} from 'typeorm';
 import { ProjectMember } from '../project-members/project-member.entity';
 import { ChatMessage } from '../chat/chat-message.entity';
 import { Task } from '../tasks/task.entity';
@@ -11,13 +17,19 @@ export class User {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
+  @Column({ type: 'varchar', unique: true, nullable: true })
+  username: string;
+
   @Column()
   name: string;
+
+  @Column({ name: 'password_hash', nullable: true })
+  passwordHash: string;
 
   @Column({ name: 'full_name', nullable: true })
   fullName: string;
 
-  @Column({ unique: true })
+  @Column({ type: 'varchar', unique: true, nullable: true })
   email: string;
 
   @Column({ name: 'avatar_url', nullable: true })
@@ -41,24 +53,24 @@ export class User {
   @CreateDateColumn({ name: 'created_at' })
   createdAt: Date;
 
-  @OneToMany(() => ProjectMember, member => member.user)
+  @OneToMany(() => ProjectMember, (member) => member.user)
   projectMembers: ProjectMember[];
 
-  @OneToMany(() => ChatMessage, message => message.user)
+  @OneToMany(() => ChatMessage, (message) => message.user)
   chatMessages: ChatMessage[];
 
-  @OneToMany(() => Task, task => task.assignee)
+  @OneToMany(() => Task, (task) => task.assignee)
   assignedTasks: Task[];
 
-  @OneToMany(() => Task, task => task.createdBy)
+  @OneToMany(() => Task, (task) => task.createdBy)
   createdTasks: Task[];
 
-  @OneToMany(() => TaskComment, comment => comment.user)
+  @OneToMany(() => TaskComment, (comment) => comment.user)
   taskComments: TaskComment[];
 
-  @OneToMany(() => Reminder, reminder => reminder.user)
+  @OneToMany(() => Reminder, (reminder) => reminder.user)
   reminders: Reminder[];
 
-  @OneToMany(() => CallParticipant, participant => participant.user)
+  @OneToMany(() => CallParticipant, (participant) => participant.user)
   callParticipants: CallParticipant[];
 }

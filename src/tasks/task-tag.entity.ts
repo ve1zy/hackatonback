@@ -6,12 +6,12 @@ export class TaskTag {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @Column({ name: 'task_id' })
+  @Column({ name: 'task_id', nullable: true })
   taskId: string;
 
-  @Column()
+  @Column({ nullable: true })
   tag: string;
 
-  @ManyToOne(() => Task, task => task.tags)
+  @ManyToOne(() => Task, (task) => task.tags)
   task: Task;
 }

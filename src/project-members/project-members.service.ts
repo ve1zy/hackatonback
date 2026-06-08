@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { ProjectMember } from './project-member.entity';
@@ -11,14 +11,16 @@ export class ProjectMembersService {
     private projectMemberRepository: Repository<ProjectMember>,
   ) {}
 
-  async create(createProjectMemberDto: CreateProjectMemberDto): Promise<ProjectMember> {
+  async create(
+    createProjectMemberDto: CreateProjectMemberDto,
+  ): Promise<ProjectMember> {
     const member = this.projectMemberRepository.create(createProjectMemberDto);
     return await this.projectMemberRepository.save(member);
   }
 
   async findByProject(projectId: string): Promise<ProjectMember[]> {
     return await this.projectMemberRepository.find({
-      where: { projectId },
+      where: { projectId: String(projectId) },
       relations: { user: true },
     });
   }

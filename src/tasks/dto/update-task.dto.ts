@@ -1,9 +1,19 @@
-import { IsString, IsOptional, IsIn, IsDateString, IsBoolean } from 'class-validator';
+import {
+  IsString,
+  IsOptional,
+  IsIn,
+  IsDateString,
+  IsBoolean,
+} from 'class-validator';
 
 export class UpdateTaskDto {
   @IsString()
   @IsOptional()
   columnId?: string;
+
+  @IsString()
+  @IsOptional()
+  columnName?: string;
 
   @IsString()
   @IsOptional()

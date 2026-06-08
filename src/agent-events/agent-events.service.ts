@@ -18,7 +18,7 @@ export class AgentEventsService {
 
   async findByProject(projectId: string): Promise<AgentEvent[]> {
     return await this.agentEventRepository.find({
-      where: { projectId },
+      where: { projectId: String(projectId) },
       order: { createdAt: 'DESC' },
     });
   }

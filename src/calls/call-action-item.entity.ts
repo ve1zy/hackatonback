@@ -1,4 +1,10 @@
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, ManyToOne } from 'typeorm';
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  CreateDateColumn,
+  ManyToOne,
+} from 'typeorm';
 import { Call } from './call.entity';
 import { Task } from '../tasks/task.entity';
 
@@ -7,13 +13,13 @@ export class CallActionItem {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @Column({ name: 'call_id' })
+  @Column({ name: 'call_id', nullable: true })
   callId: string;
 
   @Column({ name: 'task_id', nullable: true })
   taskId: string;
 
-  @Column({ type: 'text' })
+  @Column({ type: 'text', nullable: true })
   rawText: string;
 
   @Column({ name: 'auto_created', default: true })
@@ -22,9 +28,9 @@ export class CallActionItem {
   @CreateDateColumn({ name: 'created_at' })
   createdAt: Date;
 
-  @ManyToOne(() => Call, call => call.actionItems)
+  @ManyToOne(() => Call, (call) => call.actionItems)
   call: Call;
 
-  @ManyToOne(() => Task, task => task.actionItems)
+  @ManyToOne(() => Task, (task) => task.actionItems)
   task: Task;
 }

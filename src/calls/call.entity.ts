@@ -1,4 +1,12 @@
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, ManyToOne, OneToMany } from 'typeorm';
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  CreateDateColumn,
+  ManyToOne,
+  OneToMany,
+  JoinColumn,
+} from 'typeorm';
 import { Project } from '../projects/project.entity';
 import { CallParticipant } from './call-participant.entity';
 import { CallActionItem } from './call-action-item.entity';
@@ -8,16 +16,16 @@ export class Call {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @Column({ name: 'project_id' })
+  @Column({ name: 'project_id', nullable: true })
   projectId: string;
 
-  @Column()
+  @Column({ nullable: true })
   platform: 'telemost' | 'zoom' | 'meet';
 
   @Column({ name: 'meeting_url', nullable: true })
   meetingUrl: string;
 
-  @Column()
+  @Column({ nullable: true })
   title: string;
 
   @Column({ name: 'started_at', nullable: true })
@@ -35,12 +43,13 @@ export class Call {
   @CreateDateColumn({ name: 'created_at' })
   createdAt: Date;
 
-  @ManyToOne(() => Project, project => project.calls)
+  @ManyToOne(() => Project, (project) => project.calls)
+  @JoinColumn({ name: 'project_id' })
   project: Project;
 
-  @OneToMany(() => CallParticipant, participant => participant.call)
+  @OneToMany(() => CallParticipant, (participant) => participant.call)
   participants: CallParticipant[];
 
-  @OneToMany(() => CallActionItem, item => item.call)
+  @OneToMany(() => CallActionItem, (item) => item.call)
   actionItems: CallActionItem[];
 }

@@ -35,7 +35,7 @@ export class RemindersService {
 
   async findByProject(projectId: string): Promise<Reminder[]> {
     return await this.reminderRepository.find({
-      where: { task: { board: { projectId } } },
+      where: { task: { board: { projectId: String(projectId) } } },
       relations: { user: true, task: true },
     });
   }

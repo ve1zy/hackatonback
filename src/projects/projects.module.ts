@@ -11,7 +11,17 @@ import { ProjectsService } from './projects.service';
 import { ProjectsController } from './projects.controller';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Project, Board, ColumnEntity, Task, ProjectMember, ChatMessage, Call])],
+  imports: [
+    TypeOrmModule.forFeature([
+      Project,
+      Board,
+      ColumnEntity,
+      Task,
+      ProjectMember,
+      ChatMessage,
+      Call,
+    ]),
+  ],
   providers: [ProjectsService],
   controllers: [ProjectsController],
   exports: [ProjectsService],

@@ -1,4 +1,11 @@
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, ManyToOne, OneToMany } from 'typeorm';
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  CreateDateColumn,
+  ManyToOne,
+  OneToMany,
+} from 'typeorm';
 import { User } from '../users/user.entity';
 import { ProjectMember } from '../project-members/project-member.entity';
 import { Board } from '../boards/board.entity';
@@ -17,7 +24,7 @@ export class Project {
   @Column({ type: 'text', nullable: true })
   description: string;
 
-  @Column({ name: 'created_by' })
+  @Column({ name: 'created_by', nullable: true })
   createdBy: string;
 
   @Column({ name: 'chat_invite_link', nullable: true })
@@ -26,21 +33,21 @@ export class Project {
   @CreateDateColumn({ name: 'created_at' })
   createdAt: Date;
 
-  @ManyToOne(() => User, user => user.id)
+  @ManyToOne(() => User, (user) => user.id)
   user: User;
 
-  @OneToMany(() => ProjectMember, member => member.project)
+  @OneToMany(() => ProjectMember, (member) => member.project)
   members: ProjectMember[];
 
-  @OneToMany(() => Board, board => board.project)
+  @OneToMany(() => Board, (board) => board.project)
   boards: Board[];
 
-  @OneToMany(() => ChatMessage, message => message.project)
+  @OneToMany(() => ChatMessage, (message) => message.project)
   chatMessages: ChatMessage[];
 
-  @OneToMany(() => Call, call => call.project)
+  @OneToMany(() => Call, (call) => call.project)
   calls: Call[];
 
-  @OneToMany(() => AgentEvent, event => event.project)
+  @OneToMany(() => AgentEvent, (event) => event.project)
   agentEvents: AgentEvent[];
 }
